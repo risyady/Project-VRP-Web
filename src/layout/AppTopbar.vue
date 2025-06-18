@@ -1,11 +1,14 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
+import { useAuthStore } from '@/stores/authStore';
 import { ref } from 'vue';
 //import AppConfigurator from './AppConfigurator.vue';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
 const menu_profile = ref(null);
+
+const authStore = useAuthStore();
 
 const overlayMenuItems = ref([
     /* {
@@ -19,7 +22,7 @@ const overlayMenuItems = ref([
         label: 'Log Out',
         icon: 'pi pi-sign-out',
         command: () => {
-            //authStore.logout();
+            authStore.logout();
         }
     }
 ]);
