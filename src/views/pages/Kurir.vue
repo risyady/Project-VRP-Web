@@ -86,9 +86,10 @@ function confirmDeleteKurir(prod) {
 
 function deleteKurir() {
     //products.value = products.value.filter((val) => val.id !== product.value.id);
-    deleteKurirDialog.value = false;
+    /* deleteKurirDialog.value = false;
     kurir.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Kurir telah dihapus.', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Successful', detail: 'Kurir telah dihapus.', life: 3000 }); */
+    openToast('info', 'info', 'Fungsi belum diimplementasikan.');
 }
 
 function confirmDeleteSelected() {
