@@ -18,6 +18,11 @@ const router = createRouter({
                     path: '/kurir',
                     name: 'kurir',
                     component: () => import('@/views/pages/Kurir.vue')
+                },
+                {
+                    path: '/paket',
+                    name: 'paket',
+                    component: () => import('@/views/pages/Paket.vue')
                 }
             ]
         },

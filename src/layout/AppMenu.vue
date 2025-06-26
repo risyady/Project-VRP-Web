@@ -13,7 +13,7 @@ const model = ref([
         to: '/pages',
         items: [
             { label: 'Kurir', icon: 'pi pi-fw pi-id-card', to: '/kurir' },
-            { label: 'Paket', icon: 'pi pi-fw pi-clone', to: '/uikit/formlayout' },
+            { label: 'Paket', icon: 'pi pi-fw pi-clone', to: '/paket' },
             { label: 'Rute', icon: 'pi pi-fw pi-image', to: '/uikit/formlayout' }
         ]
     }

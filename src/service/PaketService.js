@@ -1,28 +1,30 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:5000/api/v1/user',
+    baseURL: 'http://127.0.0.1:5000/api/v1/paket',
     withCredentials: true
 });
 
-export const KurirService = {
-    async getKurirs() {
+export const PaketService = {
+    async getPakets() {
         try {
             const response = await apiClient.get('/');
             return response.data;
         } catch (error) {
-            console.error('Error saat mengambil data user:', error.response?.data?.message || error.message);
+            console.error('Error saat mengambil data paket:', error.response?.data?.message || error.message);
             throw error;
         }
     },
 
-    async createKurir(kurirData) {
+    async createPaket(paketData) {
         try {
             const response = await apiClient.post('/', {
-                nama: kurirData.nama,
-                email: kurirData.email,
-                password: kurirData.password,
-                role: 'kurir'
+                nama_penerima: paketData.nama_penerima,
+                alamat: paketData.alamat,
+                no_penerima: paketData.no_penerima,
+                kuantitas: paketData.kuantitas,
+                deskripsi: paketData.deskripsi,
+                berat: paketData.berat
             });
             return response.data;
         } catch (error) {
