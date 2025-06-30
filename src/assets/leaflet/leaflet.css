@@ -1,0 +1,21 @@
+html, body, #map {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.leaflet-container {
+    background: #f0f0f0;
+}
+
+.leaflet-control {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+}
+
+.leaflet-popup {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+}

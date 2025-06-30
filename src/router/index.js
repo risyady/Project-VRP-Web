@@ -23,6 +23,22 @@ const router = createRouter({
                     path: '/paket',
                     name: 'paket',
                     component: () => import('@/views/pages/Paket.vue')
+                },
+                {
+                    path: '/rute',
+                    name: 'rute',
+                    component: () => import('@/views/pages/Rute.vue')
+                },
+                {
+                    path: '/optimasi',
+                    name: 'optimasi',
+                    component: () => import('@/views/pages/Optimasi.vue')
+                },
+                {
+                    path: '/rute/:id/peta',
+                    name: 'petaRute',
+                    component: () => import('@/views/pages/PetaOptimasi.vue'),
+                    props: true
                 }
             ]
         },

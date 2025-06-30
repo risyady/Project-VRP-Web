@@ -9,12 +9,18 @@ const model = ref([
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
     },
     {
-        label: 'Menu',
+        label: 'Data Master',
         to: '/pages',
         items: [
             { label: 'Kurir', icon: 'pi pi-fw pi-id-card', to: '/kurir' },
-            { label: 'Paket', icon: 'pi pi-fw pi-clone', to: '/paket' },
-            { label: 'Rute', icon: 'pi pi-fw pi-image', to: '/uikit/formlayout' }
+            { label: 'Paket', icon: 'pi pi-fw pi-clone', to: '/paket' }
+        ]
+    },
+    {
+        label: 'Rute',
+        items: [
+            { label: 'Daftar Rute', icon: 'pi pi-fw pi-image', to: '/rute' },
+            { label: 'Buat Rute', icon: 'pi pi-fw pi-plus', to: '/optimasi' }
         ]
     }
 ]);
