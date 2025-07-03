@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:5000/api/v1/rute',
+    baseURL: process.env.VUE_APP_API_BASE_URL,
     withCredentials: true
 });
 
 export const RuteService = {
     async getRutes() {
         try {
-            const response = await apiClient.get('/');
+            const response = await apiClient.get('/rute');
             return response.data;
         } catch (error) {
             console.error('Error saat mengambil data rute:', error.response?.data?.message || error.message);
@@ -18,7 +18,7 @@ export const RuteService = {
 
     async getRute(id) {
         try {
-            const response = await apiClient.get(`/${id}`);
+            const response = await apiClient.get(`/rute/${id}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching rute with id ${id}:`, error);

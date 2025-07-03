@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:5000/api/v1/user',
+    baseURL: process.env.VUE_APP_API_BASE_URL,
     withCredentials: true
 });
 
 export const KurirService = {
     async getKurirs() {
         try {
-            const response = await apiClient.get('/');
+            const response = await apiClient.get('/user');
             return response.data;
         } catch (error) {
             console.error('Error saat mengambil data user:', error.response?.data?.message || error.message);
@@ -18,7 +18,7 @@ export const KurirService = {
 
     async createKurir(kurirData) {
         try {
-            const response = await apiClient.post('/', {
+            const response = await apiClient.post('/user', {
                 nama: kurirData.nama,
                 email: kurirData.email,
                 password: kurirData.password,

@@ -82,7 +82,7 @@ const goBack = () => {
                     <div class="text-center">
                         <i class="pi pi-map-marker text-4xl text-gray-400 mb-2"></i>
                         <p class="text-gray-500">Placeholder untuk Peta Rute</p>
-                        <small class="text-gray-400">Integrasi dengan library peta seperti Leaflet atau Google Maps diperlukan di sini.</small>
+                        <small class="text-gray-400">Untuk nanti integrasi dengan library Leaflet di sini.</small>
                     </div>
                 </div>
             </div>

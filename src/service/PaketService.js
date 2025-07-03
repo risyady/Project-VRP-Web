@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:5000/api/v1/paket',
+    baseURL: process.env.VUE_APP_API_BASE_URL,
     withCredentials: true
 });
 
 export const PaketService = {
     async getPakets() {
         try {
-            const response = await apiClient.get('/');
+            const response = await apiClient.get('/paket');
             return response.data;
         } catch (error) {
             console.error('Error saat mengambil data paket:', error.response?.data?.message || error.message);
@@ -18,7 +18,7 @@ export const PaketService = {
 
     async createPaket(paketData) {
         try {
-            const response = await apiClient.post('/', {
+            const response = await apiClient.post('/paket', {
                 nama_penerima: paketData.nama_penerima,
                 alamat: paketData.alamat,
                 no_penerima: paketData.no_penerima,
