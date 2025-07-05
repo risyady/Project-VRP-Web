@@ -1,7 +1,7 @@
 <script setup>
 import { RuteService } from '@/service/RuteService';
 import { useToast } from 'primevue';
-import { onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -9,6 +9,7 @@ const toast = useToast();
 const route = useRoute();
 const optimasiData = ref(null);
 const isLoading = ref(true);
+const map = ref();
 
 function openToast(sev, sum, det) {
     toast.add({
@@ -19,6 +20,106 @@ function openToast(sev, sum, det) {
     });
 }
 
+const initMap = () => {
+    nextTick(() => {
+        if (window.L) {
+            setupMap();
+        } else {
+            console.error('Leaflet library is not loaded.');
+        }
+    });
+};
+
+watch(optimasiData, () => {
+    if (optimasiData.value) {
+        initMap();
+        nextTick(() => {
+            displayRoute(optimasiData.value);
+        });
+    }
+});
+
+function setupMap() {
+    const [lat, lng] = import.meta.env.VITE_DEPOT_COORDS.split(',').map(Number);
+    map.value = window.L.map('map-container').setView([lat, lng], 13);
+
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map.value);
+}
+
+function displayRoute(data) {
+    let allRoutePolylines = [];
+    let allMarkers = [];
+
+    //console.log(data);
+
+    data.rute.forEach((r) => {
+        let allCoordsForRoute = [];
+        r.polyline.forEach((pointSegment) => {
+            if (pointSegment.type === 'LineString') {
+                pointSegment.coordinates.forEach((coord) => {
+                    allCoordsForRoute.push([coord[1], coord[0]]);
+                });
+            }
+        });
+
+        if (allCoordsForRoute.length > 0) {
+            const routePolyline = window.L.polyline(allCoordsForRoute, { color: `#007bff`, weight: 4 }).addTo(map.value);
+            allRoutePolylines.push(routePolyline);
+        }
+
+        r.pakets.forEach((p) => {
+            const lat = p.latitude;
+            const lng = p.longitude;
+
+            const iconClass = `marker-icon ${p.waktu_tiba ? 'delivered-icon' : 'shipped-icon'}`;
+
+            const customIcon = window.L.divIcon({
+                className: iconClass,
+                html: `<span>${p.urutan}</span>`,
+                iconSize: [25, 25],
+                iconAnchor: [12.5, 12.5]
+            });
+
+            const marker = window.L.marker([lat, lng], { icon: customIcon }).addTo(map.value);
+            allMarkers.push(marker);
+        });
+    });
+
+    const [lat, lng] = import.meta.env.VITE_DEPOT_COORDS.split(',').map(Number);
+    const depot = window.L.marker([lat, lng], {
+        icon: window.L.divIcon({
+            className: 'marker-icon start-icon',
+            iconSize: [25, 25],
+            iconAnchor: [12.5, 12.5]
+        })
+    }).addTo(map.value);
+    allMarkers.push(depot);
+
+    if (allRoutePolylines.length > 0 || allMarkers.length > 0) {
+        let bounds = new window.L.LatLngBounds([]);
+
+        allRoutePolylines.forEach((polyline) => bounds.extend(polyline.getBounds()));
+        allMarkers.forEach((marker) => bounds.extend(marker.getLatLng()));
+
+        if (bounds.isValid()) {
+            map.value.fitBounds(bounds.pad(0.1));
+        }
+    }
+}
+
+/* function getMarkerClasses(type) {
+    const typeStyles = {
+        start: 'bg-yellow-500',
+        kirim: 'bg-blue-500 ',
+        terkirim: 'bg-green-500 '
+    };
+
+    return `${typeStyles[type]}`;
+} */
+
 const fetchRuteDetail = async (id) => {
     isLoading.value = true;
     try {
@@ -27,8 +128,12 @@ const fetchRuteDetail = async (id) => {
             optimasiData.value = {
                 rute: [
                     {
-                        kurir: { nama: response.data.kurir },
-                        pakets: response.data.rute_detail.map((detail) => detail.paket),
+                        kurir: response.data.kurir,
+                        pakets: response.data.rute_detail.map((detail) => ({
+                            ...detail.paket,
+                            urutan: detail.urutan,
+                            waktu_tiba: detail.waktu_tiba
+                        })),
                         polyline: response.data.polyline
                     }
                 ]
@@ -79,11 +184,7 @@ const goBack = () => {
         <div v-else-if="optimasiData && optimasiData.rute" class="grid grid-cols-12 gap-8">
             <div class="col-span-12 lg:col-span-8">
                 <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg h-96 flex items-center justify-center">
-                    <div class="text-center">
-                        <i class="pi pi-map-marker text-4xl text-gray-400 mb-2"></i>
-                        <p class="text-gray-500">Placeholder untuk Peta Rute</p>
-                        <small class="text-gray-400">Untuk nanti integrasi dengan library Leaflet di sini.</small>
-                    </div>
+                    <div id="map-container" class="w-full h-full rounded-lg"></div>
                 </div>
             </div>
 
@@ -91,7 +192,7 @@ const goBack = () => {
                 <h5 class="font-semibold mb-4">Detail Rute Pengiriman</h5>
                 <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
                     <div v-for="(rute, index) in optimasiData.rute" :key="index" class="p-3 border rounded-lg">
-                        <p class="font-bold text-lg mb-2"><i class="pi pi-user mr-2"></i>{{ rute.kurir.nama }}</p>
+                        <p class="font-bold text-lg mb-2"><i class="pi pi-user mr-2"></i>{{ rute.kurir }}</p>
                         <p class="text-sm text-gray-600 mb-3"><i class="pi pi-box mr-2"></i>{{ rute.pakets.length }} paket</p>
                         <ol class="list-decimal list-inside space-y-1 text-sm">
                             <li v-for="paket in rute.pakets" :key="paket.id">
@@ -110,3 +211,33 @@ const goBack = () => {
         </div>
     </div>
 </template>
+
+<style>
+.marker-icon {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    line-height: 25px;
+}
+
+.delivered-icon {
+    background-color: #28a745;
+}
+.start-icon {
+    background-color: #ffc107;
+}
+
+.shipment-icon {
+    background-color: #007bff;
+}
+</style>

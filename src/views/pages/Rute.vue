@@ -134,7 +134,7 @@ const viewOnMap = (ruteData) => {
                 </Column>
                 <Column :exportable="false" style="min-width: 8rem">
                     <template #body="slotProps">
-                        <Button label="Lihat Peta" icon="pi pi-map-marker" outlined severity="secondary" @click="viewOnMap(slotProps.data)" />
+                        <Button label="Lihat Peta" icon="pi pi-map-marker" outlined severity="danger" @click="viewOnMap(slotProps.data)" />
                     </template>
                 </Column>
 
