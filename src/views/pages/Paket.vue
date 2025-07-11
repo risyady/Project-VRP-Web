@@ -200,29 +200,29 @@ function openToast(sev, sum, det) {
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="nama_penerima" class="block font-bold mb-3">Penerima</label>
-                        <InputText id="nama_penerima" v-model.trim="paket.nama_penerima" required="true" autofocus :invalid="submitted && !paket.nama_penerima" fluid />
+                        <InputText id="nama_penerima" v-model.trim="paket.nama_penerima" required autofocus :invalid="submitted && !paket.nama_penerima" fluid />
                         <small v-if="submitted && !paket.nama_penerima" class="text-red-500">Nama penerima harus diisi.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="no_penerima" class="block font-bold mb-3">No. Penerima</label>
-                        <InputText id="no_penerima" v-model.trim="paket.no_penerima" required="true" autofocus :invalid="submitted && !paket.no_penerima" fluid />
+                        <InputText id="no_penerima" v-model.trim="paket.no_penerima" required autofocus :invalid="submitted && !paket.no_penerima" fluid />
                         <small v-if="submitted && !paket.no_penerima" class="text-red-500">No. penerima harus diisi.</small>
                     </div>
                 </div>
                 <div>
                     <label for="alamat" class="block font-bold mb-3">Alamat</label>
-                    <Textarea id="alamat" v-model.trim="paket.alamat" required="true" autofocus :invalid="submitted && !paket.alamat" fluid />
+                    <Textarea id="alamat" v-model.trim="paket.alamat" required autofocus :invalid="submitted && !paket.alamat" fluid />
                     <small v-if="submitted && !paket.alamat" class="text-red-500">Alamat harus diisi.</small>
                 </div>
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="berat" class="block font-bold mb-3">Berat (gram)</label>
-                        <InputNumber id="berat" v-model="paket.berat" required="true" integeronly autofocus :invalid="submitted && !paket.berat" fluid />
+                        <InputNumber id="berat" v-model="paket.berat" required integeronly autofocus :invalid="submitted && !paket.berat" fluid />
                         <small v-if="submitted && !paket.berat" class="text-red-500">Berat harus diisi.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="kuantitas" class="block font-bold mb-3">Kuantitas</label>
-                        <InputNumber id="kuantitas" v-model="paket.kuantitas" required="true" integeronly autofocus :invalid="submitted && !paket.kuantitas" fluid />
+                        <InputNumber id="kuantitas" v-model="paket.kuantitas" required integeronly autofocus :invalid="submitted && !paket.kuantitas" fluid />
                         <small v-if="submitted && !paket.kuantitas" class="text-red-500">Kuantitas harus diisi.</small>
                     </div>
                 </div>

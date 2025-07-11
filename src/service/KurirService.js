@@ -13,7 +13,7 @@ export const KurirService = {
 
     async createKurir(kurirData) {
         try {
-            const response = await apiClient.post('/user', {
+            const response = await apiClient.post('/user/', {
                 nama: kurirData.nama,
                 email: kurirData.email,
                 password: kurirData.password,
@@ -22,6 +22,28 @@ export const KurirService = {
             return response.data;
         } catch (error) {
             console.error('Error saat membuat user baru:', error.response?.data?.message || error.message);
+            throw error;
+        }
+    },
+
+    async deleteKurir(kurirId) {
+        try {
+            const response = await apiClient.delete(`/user/${kurirId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error saat menghapus user:', error.response?.data?.message || error.message);
+            throw error;
+        }
+    },
+
+    async deleteBulkKurir(kurirIds) {
+        try {
+            const response = await apiClient.post('/user/bulk-delete', {
+                ids: kurirIds
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error saat menghapus beberapa user:', error.response?.data?.message || error.message);
             throw error;
         }
     }

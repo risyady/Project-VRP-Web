@@ -13,7 +13,7 @@ export const PaketService = {
 
     async createPaket(paketData) {
         try {
-            const response = await apiClient.post('/paket', {
+            const response = await apiClient.post('/paket/', {
                 nama_penerima: paketData.nama_penerima,
                 alamat: paketData.alamat,
                 no_penerima: paketData.no_penerima,

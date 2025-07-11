@@ -58,13 +58,8 @@ const saveKurir = async () => {
     }
 
     try {
-        if (kurir.value.id) {
-            // TODO: logika update
-            openToast('info', 'Info', 'Fungsi update belum diimplementasikan.');
-        } else {
-            const response = await KurirService.createKurir(kurir.value);
-            openToast(response.status, response.status === 'success' ? 'Berhasil' : 'Gagal', response.message);
-        }
+        const response = await KurirService.createKurir(kurir.value);
+        openToast(response.status, response.status === 'success' ? 'Berhasil' : 'Gagal', response.message);
 
         fetchKurirs();
         kurirDialog.value = false;
@@ -74,34 +69,39 @@ const saveKurir = async () => {
     }
 };
 
-function editKurir(prod) {
-    kurir.value = { ...prod };
-    kurirDialog.value = true;
-}
-
 function confirmDeleteKurir(prod) {
     kurir.value = prod;
     deleteKurirDialog.value = true;
 }
 
-function deleteKurir() {
-    //products.value = products.value.filter((val) => val.id !== product.value.id);
-    /* deleteKurirDialog.value = false;
-    kurir.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Kurir telah dihapus.', life: 3000 }); */
-    openToast('info', 'info', 'Fungsi belum diimplementasikan.');
-}
+const deleteKurir = async () => {
+    const response = await KurirService.deleteKurir(kurir.value.id);
+    if (response.status === 'success') {
+        deleteKurirDialog.value = false;
+        kurir.value = {};
+        openToast('success', 'Berhasil', 'Kurir telah dihapus.');
+        fetchKurirs();
+    } else {
+        openToast('error', 'Gagal', response.message || 'Terjadi kesalahan saat menghapus kurir.');
+    }
+};
 
 function confirmDeleteSelected() {
     deleteKurirsDialog.value = true;
 }
 
-function deleteSelectedKurirs() {
-    //products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deleteKurirsDialog.value = false;
-    selectedKurirs.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-}
+const deleteSelectedKurirs = async () => {
+    const response = await KurirService.deleteBulkKurir(selectedKurirs.value.map((k) => k.id));
+    if (response.status === 'success') {
+        openToast('success', 'Berhasil', 'Kurirs telah dihapus.');
+        deleteKurirsDialog.value = false;
+        selectedKurirs.value = null;
+        fetchKurirs();
+    } else {
+        openToast('error', 'Gagal', response.message || 'Terjadi kesalahan saat menghapus kurirs.');
+    }
+    fetchKurirs();
+};
 
 function exportCSV() {
     dt.value.exportCSV();
@@ -162,7 +162,7 @@ function openToast(sev, sum, det) {
                 <Column field="email" header="Email" sortable style="min-width: 12rem"></Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 p-button-success" @click="editKurir(slotProps.data)" />
+                        <!-- <Button icon="pi pi-pencil" outlined rounded class="mr-2 p-button-success" @click="editKurir(slotProps.data)" /> -->
                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteKurir(slotProps.data)" />
                     </template>
                 </Column>
@@ -173,17 +173,17 @@ function openToast(sev, sum, det) {
             <div class="flex flex-col gap-6">
                 <div>
                     <label for="nama" class="block font-bold mb-3">Nama</label>
-                    <InputText id="nama" v-model.trim="kurir.nama" required="true" autofocus :invalid="submitted && !kurir.nama" fluid />
+                    <InputText id="nama" v-model.trim="kurir.nama" required autofocus :invalid="submitted && !kurir.nama" fluid />
                     <small v-if="submitted && !kurir.nama" class="text-red-500">Nama harus diisi.</small>
                 </div>
                 <div>
                     <label for="email" class="block font-bold mb-3">Email</label>
-                    <InputText id="email" v-model.trim="kurir.email" required="true" autofocus :invalid="submitted && !kurir.email" fluid />
+                    <InputText id="email" v-model.trim="kurir.email" required autofocus :invalid="submitted && !kurir.email" fluid />
                     <small v-if="submitted && !kurir.email" class="text-red-500">Email harus diisi.</small>
                 </div>
-                <div v-if="!kurir.id">
+                <div>
                     <label for="password" class="block font-bold mb-3">Password</label>
-                    <Password id="password" v-model.trim="kurir.password" required="true" autofocus :invalid="submitted && !kurir.password" fluid />
+                    <Password id="password" v-model.trim="kurir.password" required autofocus :invalid="submitted && !kurir.password" fluid />
                     <small v-if="submitted && !kurir.password" class="text-red-500">Password harus diisi.</small>
                 </div>
             </div>
@@ -197,7 +197,7 @@ function openToast(sev, sum, det) {
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="kurir">
-                    Are you sure you want to delete <b>{{ kurir.nama }}</b
+                    Yakin mau hapus <b>{{ kurir.nama }}</b
                     >?
                 </span>
             </div>
@@ -210,11 +210,11 @@ function openToast(sev, sum, det) {
         <Dialog v-model:visible="deleteKurirsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="product">Are you sure you want to delete the selected kurirs?</span>
+                <span v-if="kurir">Yakin mau hapus kurir yang dipilih?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteKurirsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedKurirs" />
+                <Button label="Yes" icon="pi pi-check" @click="deleteSelectedKurirs" />
             </template>
         </Dialog>
     </div>
