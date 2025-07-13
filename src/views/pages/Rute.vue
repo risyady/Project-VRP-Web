@@ -19,7 +19,7 @@ const getStatusProps = (status) => {
         case 'berhasil':
             return { severity: 'success', text: 'Berhasil' };
         case 'dalam_pengiriman':
-            return { severity: 'warning', text: 'Pengiriman' };
+            return { severity: 'warn', text: 'Pengiriman' };
         case 'di_gudang':
             return { severity: 'info', text: 'Di Gudang' };
         case 'gagal':
@@ -33,7 +33,7 @@ const getRuteStatusProps = (status) => {
     if (status) {
         return { severity: 'success', text: 'Selesai' };
     } else {
-        return { severity: 'warning', text: 'Aktif' };
+        return { severity: 'warn', text: 'Aktif' };
     }
 };
 

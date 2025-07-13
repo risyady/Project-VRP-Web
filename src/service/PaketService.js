@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 export const PaketService = {
     async getPakets() {
         try {
-            const response = await apiClient.get('/paket');
+            const response = await apiClient.get('/paket/');
             return response.data;
         } catch (error) {
             console.error('Error saat mengambil data paket:', error.response?.data?.message || error.message);

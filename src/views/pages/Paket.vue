@@ -8,10 +8,7 @@ const toast = useToast();
 const dt = ref();
 const pakets = ref([]);
 const paketDialog = ref(false);
-const deletePaketDialog = ref(false);
-const deletePaketsDialog = ref(false);
 const paket = ref({});
-const selectedPakets = ref([]);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
@@ -24,7 +21,7 @@ const getStatusProps = (status) => {
             return { severity: 'success', text: 'Berhasil', icon: 'pi pi-check-circle' };
 
         case 'dalam_pengiriman':
-            return { severity: 'warning', text: 'Pengiriman', icon: 'pi pi-truck' };
+            return { severity: 'warn', text: 'Pengiriman', icon: 'pi pi-truck' };
 
         case 'di_gudang':
             return { severity: 'info', text: 'Di Gudang', icon: 'pi pi-inbox' };
@@ -77,6 +74,8 @@ const savePaket = async () => {
         return;
     }
 
+    isLoading.value = true;
+    paketDialog.value = false;
     try {
         if (paket.value.id) {
             // TODO: logika update
@@ -85,43 +84,38 @@ const savePaket = async () => {
             const response = await PaketService.createPaket(paket.value);
             openToast(response.status, response.status === 'success' ? 'Berhasil' : 'Gagal', response.message);
         }
-
-        fetchPakets();
-        paketDialog.value = false;
+        await fetchPakets();
         paket.value = {};
     } catch (error) {
         openToast('error', 'Error', error.response?.data?.message || 'Terjadi kesalahan pada server.');
+    } finally {
+        isLoading.value = false;
     }
 };
 
-function editPaket(prod) {
+/* function editPaket(prod) {
     paket.value = { ...prod };
     paketDialog.value = true;
-}
+} */
 
-function confirmDeletePaket(prod) {
+/* function confirmDeletePaket(prod) {
     paket.value = prod;
     deletePaketDialog.value = true;
-}
+} */
 
-function deletePaket() {
-    //products.value = products.value.filter((val) => val.id !== product.value.id);
-    /* deleteKurirDialog.value = false;
-    kurir.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Kurir telah dihapus.', life: 3000 }); */
-    openToast('info', 'info', 'Fungsi belum diimplementasikan.');
-}
-
-function confirmDeleteSelected() {
-    deletePaketsDialog.value = true;
-}
-
-function deleteSelectedPakets() {
-    //products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deletePaketsDialog.value = false;
-    selectedPakets.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Paket-paket pilihan telah dihapus.', life: 3000 });
-}
+/* function deletePaket() {
+    PaketService.deletePaket(paket.value.id)
+        .then((response) => {
+            openToast(response.status, response.status === 'success' ? 'Berhasil' : 'Gagal', response.message);
+            fetchPakets();
+            deletePaketDialog.value = false;
+            paket.value = {};
+        })
+        .catch((error) => {
+            openToast('error', 'Error', error.response?.data?.message || 'Terjadi kesalahan pada server.');
+        });
+    fetchPakets();
+} */
 
 function exportCSV() {
     dt.value.exportCSV();
@@ -143,7 +137,6 @@ function openToast(sev, sum, det) {
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2 p-button-success" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="secondary" @click="confirmDeleteSelected" :disabled="!selectedPakets || !selectedPakets.length" />
                 </template>
 
                 <template #end>
@@ -153,7 +146,6 @@ function openToast(sev, sum, det) {
 
             <DataTable
                 ref="dt"
-                v-model:selection="selectedPakets"
                 :value="pakets"
                 :loading="isLoading"
                 dataKey="id"
@@ -177,7 +169,11 @@ function openToast(sev, sum, det) {
                     </div>
                 </template>
 
-                <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+                <Column header="#" style="width: 3rem">
+                    <template #body="slotProps">
+                        {{ (dt.first || 0) + pakets.indexOf(slotProps.data) + 1 }}
+                    </template>
+                </Column>
                 <Column field="resi" header="No. Resi" sortable style="min-width: 12rem"></Column>
                 <Column field="nama_penerima" header="Penerima" sortable style="min-width: 12rem"></Column>
                 <Column field="alamat" header="Alamat" sortable style="min-width: 12rem"></Column>
@@ -186,12 +182,12 @@ function openToast(sev, sum, det) {
                         <Tag :severity="getStatusProps(data.status).severity" :value="getStatusProps(data.status).text" :icon="getStatusProps(data.status).icon" />
                     </template>
                 </Column>
-                <Column :exportable="false" style="min-width: 12rem">
+                <!-- <Column :exportable="false" style="min-width: 18rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 p-button-success" @click="editPaket(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeletePaket(slotProps.data)" />
+                        <Button label="Edit" icon="pi pi-pencil" outlined rounded class="mr-2 p-button-success" @click="editPaket(slotProps.data)" :disabled="slotProps.data.status !== 'di_gudang'" />
+                        <Button label="Delete" icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeletePaket(slotProps.data)" :disabled="slotProps.data.status !== 'di_gudang'" />
                     </template>
-                </Column>
+                </Column> -->
             </DataTable>
         </div>
 
@@ -237,7 +233,7 @@ function openToast(sev, sum, det) {
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="deletePaketDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <!-- <Dialog v-model:visible="deletePaketDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="paket">
@@ -249,17 +245,6 @@ function openToast(sev, sum, det) {
                 <Button label="No" icon="pi pi-times" text @click="deletePaketDialog = false" />
                 <Button label="Yes" icon="pi pi-check" @click="deletePaket" />
             </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deletePaketsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="paket">Are you sure you want to delete the selected pakets?</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deletePaketsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedPakets" />
-            </template>
-        </Dialog>
+        </Dialog> -->
     </div>
 </template>

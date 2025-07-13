@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 export const KurirService = {
     async getKurirs() {
         try {
-            const response = await apiClient.get('/user');
+            const response = await apiClient.get('/user/');
             return response.data;
         } catch (error) {
             console.error('Error saat mengambil data user:', error.response?.data?.message || error.message);
@@ -32,18 +32,6 @@ export const KurirService = {
             return response.data;
         } catch (error) {
             console.error('Error saat menghapus user:', error.response?.data?.message || error.message);
-            throw error;
-        }
-    },
-
-    async deleteBulkKurir(kurirIds) {
-        try {
-            const response = await apiClient.post('/user/bulk-delete', {
-                ids: kurirIds
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error saat menghapus beberapa user:', error.response?.data?.message || error.message);
             throw error;
         }
     }
