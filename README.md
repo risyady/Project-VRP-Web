@@ -73,9 +73,9 @@ Follow these steps to run this project in your local environment.
 This project requires several environment variables to run correctly. Make sure your `.env` file has the following keys:
 
 - `VITE_API_BASE_URL`: The base URL of the VRP Solver API backend.
-  - Example: `http://localhost:5000/api/v1`
+  Example: `http://localhost:5000/api/v1`
 
 - `VITE_DEPOT_COORDS`: Geographical coordinates (latitude, longitude) of the main depot or warehouse. These coordinates are used as the starting and ending points for all routes.  
-  - Example: `-0.922474,100.445834`
+  Example: `-0.922474,100.445834`
 
 ---
